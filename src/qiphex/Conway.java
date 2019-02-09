@@ -1,5 +1,4 @@
 package qiphex;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -19,7 +18,6 @@ public class Conway {
 	
 	static final int w=240;
 	static final int h=144;
-	int gs = 1;
 	
 	int frame=0;
 	
@@ -46,9 +44,8 @@ public class Conway {
 		Random r = new Random(1);
 		r.setSeed(seed);
 		try {
-			Display.setDisplayMode(new DisplayMode(w*gs,h*gs));
+			Display.setDisplayMode(new DisplayMode(w,h));
 			Display.setTitle("Conway Game of Life Recorder");
-			Display.setResizable(true);
 			Display.create();
 		} catch (LWJGLException e) {
 			e.printStackTrace();
@@ -56,7 +53,7 @@ public class Conway {
 		
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
-		GL11.glOrtho(0,w*gs,h*gs,0,1,-1);
+		GL11.glOrtho(0,w,h,0,1,-1);
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		for(int i=0;i<grid.length;i++) {
 			grid[i] = (byte)(r.nextBoolean() ? 1:0);
@@ -65,12 +62,10 @@ public class Conway {
 		while(!Display.isCloseRequested()&&!complete) {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT|GL11.GL_DEPTH_BUFFER_BIT);
 			render();
-			running= (Keyboard.isKeyDown(Keyboard.KEY_SPACE));
-			if(running) {
-				save();
-				iterate();
-				frame++;
-			}
+			
+			save();
+			iterate();
+			frame++;
 			
 			Display.update();
 			Display.sync(60);
@@ -106,19 +101,15 @@ public class Conway {
 	}
 	
 	private void render() {
-		byte s;
-		GL11.glBegin(GL11.GL_QUADS); //I feel disgusting for using this, but I'm not exactly focusing on the renderer here.
-		s=(byte)((!running)?0:1);
-		GL11.glColor3f(1, s, s);
+		
+		GL11.glBegin(GL11.GL_POINTS); //I feel disgusting for using this, but I'm not exactly focusing on the renderer here.
+		GL11.glColor3f(1, 1, 1);
 		
 		for(int i=0;i<size;i++) {
 			if(grid[i]!=0) {
 				int x=i%w;
 				int y=i/w;
-				GL11.glVertex2f(x*gs, y*gs);
-				GL11.glVertex2f(x*gs+gs, y*gs);
-				GL11.glVertex2f(x*gs+gs, y*gs+gs);
-				GL11.glVertex2f(x*gs, y*gs+gs);
+				GL11.glVertex2f(x, y);
 			}
 		}
 		GL11.glEnd();
@@ -191,5 +182,3 @@ public class Conway {
 		new Conway();
 	}
 }
-
-
